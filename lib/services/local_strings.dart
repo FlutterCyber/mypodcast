@@ -4,7 +4,7 @@ class LocalStrings extends Translations {
   @override
   Map<String, Map<String, String>> get keys => {
         'en_US': {
-          'Language': 'language',
+          'Language': 'Language',
           'Mode': 'Mode',
           'History': 'History',
           'Popular books': 'Popular books',
