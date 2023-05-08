@@ -1,23 +1,28 @@
-import 'dart:io';
+import 'dart:developer';
 import 'dart:ui';
 import 'package:audio_video_progress_bar/audio_video_progress_bar.dart';
+import 'package:dio/dio.dart';
+import 'package:ebook_app/controllers/parser/text_parser.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_pdfview/flutter_pdfview.dart';
 import 'package:get/get.dart';
 import 'package:iconly/iconly.dart';
 import 'package:just_audio/just_audio.dart';
-import 'package:path/path.dart';
 import 'package:rxdart/rxdart.dart' as rxdart;
 import '../../controllers/music_payer/music_payer_controller.dart';
 import '../../controllers/music_payer/music_position_data.dart';
 
 class AudioWithPdfPage extends StatefulWidget {
-  final File file;
   final String audioLink;
+  final String title;
+  final txtUrl;
 
-  const AudioWithPdfPage(
-      {Key? key, required this.file, required this.audioLink})
-      : super(key: key);
+  const AudioWithPdfPage({
+    Key? key,
+    required this.audioLink,
+    required this.title,
+    required this.txtUrl,
+  }) : super(key: key);
 
   @override
   State<AudioWithPdfPage> createState() => _AudioWithPdfPageState();
@@ -28,19 +33,42 @@ class _AudioWithPdfPageState extends State<AudioWithPdfPage> {
   late AudioPlayer _audioPlayer;
   int pages = 0;
   int indexPage = 0;
+  List<Chapters> chapters = [];
+  bool isLoading = true;
+  final _scrollController = ScrollController();
+
+  void _scrollListener() {
+    setState(() {});
+  }
+
+  Future<void> getChaptersText() async {
+    Dio dio = Dio();
+    final response = await dio.get(
+      widget.txtUrl,
+    );
+    if (response.statusCode == 200) {
+      setState(() {
+        chapters.addAll(Chapters.parser(response.data));
+        isLoading = false;
+      });
+    } else {
+      log('Have arror');
+    }
+  }
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
+    getChaptersText();
+    _scrollController.addListener(_scrollListener);
     _audioPlayer = AudioPlayer()..setUrl(widget.audioLink);
   }
 
   @override
   void dispose() {
-    // TODO: implement dispose
-    super.dispose();
+    _scrollController.removeListener(_scrollListener);
     _audioPlayer.dispose();
+    super.dispose();
   }
 
   Stream<MusicPositionData> get _positionDataStream => rxdart.Rx.combineLatest3(
@@ -50,13 +78,12 @@ class _AudioWithPdfPageState extends State<AudioWithPdfPage> {
         (position, duration, bufferedPosition) => MusicPositionData(
           position: position,
           duration: duration,
-          bufferedPosition: bufferedPosition ?? Duration.zero,
+          bufferedPosition: bufferedPosition,
         ),
       );
 
   @override
   Widget build(BuildContext context) {
-    final name = basename(widget.file.path);
     final text = "${indexPage + 1} of $pages";
     return Scaffold(
       appBar: AppBar(
@@ -70,72 +97,115 @@ class _AudioWithPdfPageState extends State<AudioWithPdfPage> {
             color: Color(0xffBFA054),
           ),
         ),
-        actions: [
-          Center(
-            child: Text(
-              text,
-              style: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 16,
-                  color: Color(0xffBFA054)),
-            ),
-          ),
-          IconButton(
-            onPressed: () {
-              final page = indexPage == 0 ? pages : indexPage - 1;
-              controller.setPage(page);
-            },
-            icon: const Icon(
-              IconlyBroken.arrow_left,
-              color: Color(0xffBFA054),
-            ),
-          ),
-          IconButton(
-            onPressed: () {
-              final page = indexPage == pages - 1 ? 0 : indexPage + 1;
-              controller.setPage(page);
-            },
-            icon:
-                const Icon(IconlyBroken.arrow_right, color: Color(0xffBFA054)),
-          ),
-        ],
         title: Text(
-          name,
+          widget.title,
           style: const TextStyle(color: Color(0xffBFA054)),
         ),
       ),
-      body: Stack(
-        children: [
-          PDFView(
-            filePath: widget.file.path,
-            //swipeHorizontal: true,
-            pageSnap: false,
-            pageFling: false,
-            autoSpacing: false,
-            //nightMode: true,
-            onRender: (pages) {
-              setState(() {
-                this.pages = pages!;
-              });
-            },
-            onViewCreated: (controller) {
-              setState(() {
-                this.controller = controller;
-              });
-            },
-            onPageChanged: (indexPage, _) {
-              setState(
-                () {
-                  this.indexPage = indexPage!;
-                },
-              );
-            },
-          ),
-        ],
-      ),
+      body: isLoading
+          ? const Center(
+              child: CircularProgressIndicator(),
+            )
+          : Padding(
+              padding: const EdgeInsets.only(
+                  left: 16, right: 16, top: 16, bottom: 140),
+              child: StreamBuilder<MusicPositionData>(
+                  stream: _positionDataStream,
+                  builder: (context, snapshot) {
+                    final data = snapshot.data ??
+                        MusicPositionData(
+                          position: Duration.zero,
+                          duration: Duration.zero,
+                          bufferedPosition: Duration.zero,
+                        );
+                    return CustomScrollView(
+                      controller: _scrollController,
+                      slivers: [
+                        SliverList(
+                          delegate:
+                              SliverChildBuilderDelegate((context, index) {
+                            bool isReading = false;
+                            bool isReaded = false;
+                            if (snapshot.data!.duration != null) {
+                              Future.delayed(Duration.zero, () {
+                                _scrollController.animateTo(
+                                    chapters[index].start /
+                                        snapshot.data!.duration!.inSeconds,
+                                    duration: Duration.zero,
+                                    curve: Curves.linear);
+                              });
+                            }
+                            if (index != chapters.length - 1) {
+                              if (data.position.inSeconds >
+                                      chapters[index].start &&
+                                  data.position.inSeconds <
+                                      chapters[index + 1].start) {
+                                isReading = true;
+                              } else {
+                                isReading = false;
+                              }
+                            } else {
+                              if (data.duration != null) {
+                                if (data.position.inSeconds >
+                                        chapters[index].start &&
+                                    data.position.inSeconds <
+                                        data.duration!.inSeconds) {
+                                  isReading = true;
+                                } else {
+                                  isReading = false;
+                                }
+                              }
+                            }
+                            if (data.position.inSeconds >
+                                chapters[index].start) {
+                              isReaded = true;
+                            } else {
+                              isReaded = false;
+                            }
+                            return textCard(
+                              chapters[index],
+                              () {
+                                _audioPlayer.seek(
+                                  Duration(
+                                    seconds: chapters[index].start,
+                                  ),
+                                );
+                              },
+                              isReading,
+                              isReaded,
+                            );
+                          }, childCount: chapters.length),
+                        ),
+                      ],
+                    );
+                  }),
+            ),
       floatingActionButton: _audioPlayerWidget(),
       floatingActionButtonLocation:
           FloatingActionButtonLocation.miniCenterDocked,
+    );
+  }
+
+  Widget textCard(
+      Chapters chapter, void Function() onTap, bool isReading, bool isReaded) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 12, bottom: 24),
+      child: GestureDetector(
+        onTap: onTap,
+        child: Text(
+          chapter.text.trim(),
+          style: TextStyle(
+            color: isReading
+                ? const Color(0xffBFA054)
+                : isReaded
+                    ? Colors.black
+                    : Colors.grey,
+            fontSize: isReading ? 20 : 18,
+            fontWeight: isReading ? FontWeight.w700 : FontWeight.w500,
+          ),
+          textAlign: TextAlign.left,
+        ),
+      ),
     );
   }
 
@@ -193,13 +263,15 @@ class _AudioWithPdfPageState extends State<AudioWithPdfPage> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         IconButton(
-                          onPressed: () {},
+                          onPressed: () {
+
+                          },
                           icon: const Icon(
                             IconlyBroken.arrow_left_circle,
                             size: 40,
                           ),
                         ),
-                         Text("10 sec".tr),
+                        Text("10 sec".tr),
                       ],
                     ),
                   ),

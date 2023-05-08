@@ -9,7 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:iconly/iconly.dart';
 
-class HomePage extends GetView {
+class HomePage extends StatelessWidget {
   @override
   final controller = PageController();
 
@@ -22,14 +22,22 @@ class HomePage extends GetView {
         elevation: 0,
         backgroundColor: const Color(0xffF5EFE1),
         actions: [
-          NotificationsBadge2(),
+          NotificationsBadge(),
           IconButton(
             icon: const Icon(IconlyBroken.search, color: Color(0xff2F2F2F)),
-            onPressed: () {},
+            onPressed: () {
+              Get.snackbar(
+                "Not available yet".tr,
+                "",
+                icon: const Icon(IconlyBroken.danger,
+                    color: Colors.black),
+                snackPosition: SnackPosition.BOTTOM,
+              );
+            },
           ),
         ],
         title: const Text(
-          "Leonardo English",
+          "Listen Me",
           style: TextStyle(
               fontSize: 20,
               color: Color(0xff2F2F2F),

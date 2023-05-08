@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:ebook_app/pages/book_info_page/book_info_page.dart';
 import 'package:flutter/material.dart';
@@ -7,58 +9,86 @@ class PopularBooksWidget extends StatelessWidget {
   static const String id = "popular_books_widget";
 
   PopularBooksWidget({Key? key}) : super(key: key);
-  final CollectionReference _newest_podcasts =
-      FirebaseFirestore.instance.collection("newest_podcasts");
+
+  Future<Stream<QuerySnapshot<Object?>>> stream() async {
+    final popular =
+        await FirebaseFirestore.instance.collection("top_podcasts").get();
+    if (popular.docs.length < 5) {
+      return FirebaseFirestore.instance
+          .collection("newest_podcasts")
+          .snapshots();
+    } else {
+      return FirebaseFirestore.instance.collection("top_podcasts").snapshots();
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return SliverToBoxAdapter(
-      child: StreamBuilder(
-        stream: _newest_podcasts.snapshots(),
-        builder: (context, AsyncSnapshot<QuerySnapshot> streamSnapshot) {
-          if (streamSnapshot.hasData) {
-            return ListView.builder(
-              physics: NeverScrollableScrollPhysics(),
-              scrollDirection: Axis.vertical,
-              shrinkWrap: true,
-              itemCount: streamSnapshot.data!.docs.length,
-              itemBuilder: (context, index) {
-                final DocumentSnapshot documentSnapshot =
-                    streamSnapshot.data!.docs[index];
-                return _topBooksWidget(
-                  "${documentSnapshot["name"]}",
-                  "${documentSnapshot["duration"]}",
-                  "${documentSnapshot["imageLink"]}",
-                  "${documentSnapshot["pdfLink"]}",
-                  "${documentSnapshot["audioLink"]}",
-                  "${documentSnapshot["releaseDate"]}",
-                  "${documentSnapshot["synopsis"]}",
-                  "${documentSnapshot["details"]}",
-                  documentSnapshot.id,
+      child: FutureBuilder(
+        future: stream(),
+        builder: (context, snapshot) {
+          if (snapshot.hasData) {
+            return StreamBuilder(
+              stream: snapshot.data,
+              builder: (context, AsyncSnapshot<QuerySnapshot> streamSnapshot) {
+                if (streamSnapshot.hasData) {
+                  return ListView.builder(
+                    physics: const NeverScrollableScrollPhysics(),
+                    scrollDirection: Axis.vertical,
+                    shrinkWrap: true,
+                    itemCount: streamSnapshot.data!.docs.length,
+                    itemBuilder: (context, index) {
+                      final DocumentSnapshot documentSnapshot =
+                          streamSnapshot.data!.docs[index];
+                      log(">>> $documentSnapshot <<<");
+                      return _topBooksWidget(
+                        "${documentSnapshot["name"]}",
+                        "${documentSnapshot["duration"]}",
+                        "${documentSnapshot["imageLink"]}",
+                        "${documentSnapshot["pdfLink"]}",
+                        "${documentSnapshot["audioLink"]}",
+                        "${documentSnapshot["releaseDate"]}",
+                        "${documentSnapshot["synopsis"]}",
+                        "${documentSnapshot["details"]}",
+                        documentSnapshot.id,
+                        "${documentSnapshot["textLink"]}",
+                        "${documentSnapshot["vocabularyLink"]}",
+
+                      );
+                    },
+                  );
+                }
+                return const Center(
+                  child: CircularProgressIndicator(
+                    color: Color(0xffBFA054),
+                  ),
                 );
               },
             );
+          } else {
+            return const Center(
+              child: CircularProgressIndicator(),
+            );
           }
-          return const Center(
-            child: CircularProgressIndicator(
-              color: Color(0xffBFA054),
-            ),
-          );
         },
       ),
     );
   }
 
   Widget _topBooksWidget(
-      String name,
-      String duration,
-      String imageLink,
-      String pdfLink,
-      String audioLink,
-      String releaseDate,
-      String synopsis,
-      String details,
-      String podcastId) {
+    String name,
+    String duration,
+    String imageLink,
+    String pdfLink,
+    String audioLink,
+    String releaseDate,
+    String synopsis,
+    String details,
+    String podcastId,
+    String textLink,
+    String vocabularyLink,
+  ) {
     return GestureDetector(
       behavior: HitTestBehavior.translucent,
       onTap: () {
@@ -73,6 +103,8 @@ class PopularBooksWidget extends StatelessWidget {
             synopsis: synopsis,
             details: details,
             podcastId: podcastId,
+            text: textLink,
+            vocabularyLink: vocabularyLink,
           ),
         );
       },

@@ -3,19 +3,19 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:iconly/iconly.dart';
 import 'package:badges/badges.dart' as badges;
-import '../../../controllers/notification_visibility/visibility_controller.dart';
+import '../../../controllers/visibility/visibility_controller.dart';
 import '../../../services/hivedb_notifications.dart';
 
-class NotificationsBadge2 extends StatefulWidget {
+class NotificationsBadge extends StatefulWidget {
   static const String id = "safgadf";
 
-  NotificationsBadge2({Key? key}) : super(key: key);
+  NotificationsBadge({Key? key}) : super(key: key);
 
   @override
-  State<NotificationsBadge2> createState() => _NotificationsBadge2State();
+  State<NotificationsBadge> createState() => _NotificationsBadgeState();
 }
 
-class _NotificationsBadge2State extends State<NotificationsBadge2> {
+class _NotificationsBadgeState extends State<NotificationsBadge> {
   /// variables
   final CollectionReference newest_podcasts =
   FirebaseFirestore.instance.collection("newest_podcasts");
@@ -54,6 +54,7 @@ class _NotificationsBadge2State extends State<NotificationsBadge2> {
               ),
               onPressed: () {
                 vc.changeVisibility();
+
               },
             ),
           );

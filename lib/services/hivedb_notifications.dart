@@ -2,7 +2,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
 class HiveDBNotifications {
-
   static Box<String> notifications_box = Hive.box<String>("notifications_id");
 
   static Listenable get podcastListenable => notifications_box.listenable();
@@ -10,6 +9,7 @@ class HiveDBNotifications {
   static Future<void> saveId(String id) async {
     return await notifications_box.put(id, id);
   }
+
   static Future<void> saveOne() async {
     return await notifications_box.put(1, "1");
   }

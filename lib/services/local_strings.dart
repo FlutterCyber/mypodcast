@@ -22,6 +22,8 @@ class LocalStrings extends Translations {
           'Empty bookmarks': 'Empty bookmarks',
           'Bookmarks': 'Bookmarks',
           '10 sec': '10 sec',
+          'Vocabulary': 'Vocabulary',
+          'Not available yet': 'Not available yet!',
           'New podcasts has been added for you!': 'New podcasts has been added for you!',
           'Added to bookmarks': 'Added to bookmarks',
           'You can listen this podcast in bookmark page':
@@ -47,6 +49,8 @@ class LocalStrings extends Translations {
           'Empty bookmarks': 'Пустые закладки',
           'Bookmarks': 'Закладки',
           '10 sec': '10 сек',
+          'Vocabulary': 'Словарь',
+          'Not available yet': 'Пока недоступно!',
           'New podcasts has been added for you!': 'Для вас добавлены новые подкасты!',
           'Added to bookmarks': 'Добавил в Закладки',
           'You can listen this podcast in bookmark page':

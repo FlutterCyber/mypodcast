@@ -30,12 +30,24 @@ class _BooksPageState extends State<BooksPage> {
                 IconlyBroken.notification,
                 color: Color(0xff2F2F2F),
               ),
-              onPressed: () {},
+              onPressed: () {
+                Get.snackbar(
+                  "Not available yet".tr,
+                  "",
+                  icon: const Icon(IconlyBroken.danger, color: Colors.black),
+                  snackPosition: SnackPosition.BOTTOM,
+                );
+              },
             ),
             IconButton(
               icon: const Icon(IconlyBroken.search, color: Color(0xff2F2F2F)),
               onPressed: () {
-                print("Pressed");
+                Get.snackbar(
+                  "Not available yet".tr,
+                  "",
+                  icon: const Icon(IconlyBroken.danger, color: Colors.black),
+                  snackPosition: SnackPosition.BOTTOM,
+                );
               },
             ),
           ],

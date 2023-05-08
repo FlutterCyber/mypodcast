@@ -1,14 +1,13 @@
 import 'dart:ui';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:ebook_app/controllers/notification_visibility/visibility_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import '../../../controllers/visibility/visibility_controller.dart';
 import '../../book_info_page/book_info_page.dart';
 
 class NotificationsWidget extends GetView {
   final CollectionReference _newest_podcasts =
-  FirebaseFirestore.instance.collection("newest_podcasts");
-
+      FirebaseFirestore.instance.collection("newest_podcasts");
 
   NotificationsWidget({Key? key}) : super(key: key);
 
@@ -16,7 +15,7 @@ class NotificationsWidget extends GetView {
   Widget build(BuildContext context) {
     VisibleController vv = Get.put(VisibleController());
     return Obx(
-          () => Visibility(
+      () => Visibility(
         visible: vv.isVisible.value,
         maintainSize: true,
         maintainAnimation: true,
@@ -42,48 +41,43 @@ class NotificationsWidget extends GetView {
                     ],
                   ),
                   border: Border.all(color: const Color(0xffBFA054), width: 2),
-                  borderRadius: BorderRadius.all(Radius.circular(5)),
+                  borderRadius: const BorderRadius.all(Radius.circular(5)),
                 ),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                     Text("New podcasts has been added for you!".tr,style: TextStyle(fontSize: 18,fontWeight: FontWeight.bold),),
-                    const SizedBox(height: 5,),
-                    StreamBuilder(
-                      stream: _newest_podcasts.snapshots(),
-                      builder:
-                          (context, AsyncSnapshot<QuerySnapshot> streamSnapshot) {
-                        if (streamSnapshot.hasData) {
-                          return ListView.builder(
-                            //physics: NeverScrollableScrollPhysics(),
-                            shrinkWrap: true,
-                            scrollDirection: Axis.vertical,
-                            itemCount: streamSnapshot.data!.docs.length,
-                            itemBuilder: (context, index) {
-                              final DocumentSnapshot documentSnapshot =
+                child: StreamBuilder(
+                  stream: _newest_podcasts.snapshots(),
+                  builder: (context,
+                      AsyncSnapshot<QuerySnapshot> streamSnapshot) {
+                    if (streamSnapshot.hasData) {
+                      return ListView.builder(
+                        physics: const AlwaysScrollableScrollPhysics(),
+                        shrinkWrap: true,
+                        scrollDirection: Axis.vertical,
+                        itemCount: streamSnapshot.data!.docs.length,
+                        itemBuilder: (context, index) {
+                          final DocumentSnapshot documentSnapshot =
                               streamSnapshot.data!.docs[index];
-                              return _notificationsWidget(
-                                "${documentSnapshot["name"]}",
-                                "${documentSnapshot["duration"]}",
-                                "${documentSnapshot["imageLink"]}",
-                                "${documentSnapshot["pdfLink"]}",
-                                "${documentSnapshot["audioLink"]}",
-                                "${documentSnapshot["releaseDate"]}",
-                                "${documentSnapshot["synopsis"]}",
-                                "${documentSnapshot["details"]}",
-                                documentSnapshot.id,
-                              );
-                            },
+                          return _notificationsWidget(
+                            "${documentSnapshot["name"]}",
+                            "${documentSnapshot["duration"]}",
+                            "${documentSnapshot["imageLink"]}",
+                            "${documentSnapshot["pdfLink"]}",
+                            "${documentSnapshot["audioLink"]}",
+                            "${documentSnapshot["releaseDate"]}",
+                            "${documentSnapshot["synopsis"]}",
+                            "${documentSnapshot["details"]}",
+                            documentSnapshot.id,
+                            "${documentSnapshot["textLink"]}",
+                            "${documentSnapshot["vocabularyLink"]}",
                           );
-                        }
-                        return const Center(
-                          child: CircularProgressIndicator(
-                            color: Color(0xffBFA054),
-                          ),
-                        );
-                      },
-                    ),
-                  ],
+                        },
+                      );
+                    }
+                    return const Center(
+                      child: CircularProgressIndicator(
+                        color: Color(0xffBFA054),
+                      ),
+                    );
+                  },
                 ),
               ),
             ),
@@ -94,20 +88,24 @@ class NotificationsWidget extends GetView {
   }
 
   Widget _notificationsWidget(
-      String name,
-      String duration,
-      String imageLink,
-      String pdfLink,
-      String audioLink,
-      String releaseDate,
-      String synopsis,
-      String details,
-      String podcastId) {
+    String name,
+    String duration,
+    String imageLink,
+    String pdfLink,
+    String audioLink,
+    String releaseDate,
+    String synopsis,
+    String details,
+    String podcastId,
+    String vocabularyLink,
+    String txt,
+  ) {
     return GestureDetector(
       behavior: HitTestBehavior.translucent,
       onTap: () {
         Get.to(
           BookInfoPage(
+            text: txt,
             name: name,
             duration: duration,
             imageLink: imageLink,
@@ -117,6 +115,7 @@ class NotificationsWidget extends GetView {
             synopsis: synopsis,
             details: details,
             podcastId: podcastId,
+            vocabularyLink: vocabularyLink,
           ),
         );
       },

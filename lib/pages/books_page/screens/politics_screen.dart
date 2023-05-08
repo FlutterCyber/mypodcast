@@ -34,6 +34,8 @@ class PoliticsScreen extends StatelessWidget {
                     "${documentSnapshot["synopsis"]}",
                     "${documentSnapshot["details"]}",
                     documentSnapshot.id,
+                    "${documentSnapshot["textLink"]}",
+                    "${documentSnapshot["vocabularyLink"]}",
                   );
                 },
                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
@@ -63,11 +65,14 @@ class PoliticsScreen extends StatelessWidget {
     String synopsis,
     String details,
     String podcastId,
+    String textLink,
+    String vocabularyLink,
   ) {
     return GestureDetector(
       onTap: () {
         Get.to(
           BookInfoPage(
+            text: textLink,
             name: name,
             duration: duration,
             imageLink: imageLink,
@@ -77,6 +82,7 @@ class PoliticsScreen extends StatelessWidget {
             synopsis: synopsis,
             details: details,
             podcastId: podcastId,
+            vocabularyLink: vocabularyLink,
           ),
         );
       },

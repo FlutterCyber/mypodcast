@@ -34,6 +34,8 @@ class ScienceScreen extends StatelessWidget {
                     "${documentSnapshot["synopsis"]}",
                     "${documentSnapshot["details"]}",
                     "${documentSnapshot.id}",
+                    "${documentSnapshot["textLink"]}",
+                    "${documentSnapshot["vocabularyLink"]}",
                   );
                 },
                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
@@ -62,11 +64,15 @@ class ScienceScreen extends StatelessWidget {
       String releaseDate,
       String synopsis,
       String details,
-      String podcastId) {
+      String podcastId,
+      String text,
+      String vocabularyLink,
+      ) {
     return GestureDetector(
       onTap: () {
         Get.to(
           BookInfoPage(
+            text: text,
             name: name,
             duration: duration,
             imageLink: imageLink,
@@ -76,6 +82,7 @@ class ScienceScreen extends StatelessWidget {
             synopsis: synopsis,
             details: details,
             podcastId: podcastId,
+            vocabularyLink: vocabularyLink,
           ),
         );
       },

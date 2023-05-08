@@ -70,60 +70,106 @@ class _NavBarWidgetState extends State<NavBarWidget> {
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              GestureDetector(
-                onTap: () {
-                  setState(() {
-                    pageController.jumpToPage(0);
-                    currentIndex = 0;
-                  });
-                },
-                child: Icon(
-                  currentIndex == 0 ? IconlyBold.home : IconlyLight.home,
-                  color: currentIndex == 0 ? Color(0xff2F2F2F) : Colors.grey,
-                  size: currentIndex == 0 ? 30 : 28,
-                ),
-              ),
-              GestureDetector(
-                onTap: () {
-                  setState(() {
-                    pageController.jumpToPage(1);
-                    currentIndex = 1;
-                  });
-                },
-                child: Icon(
-                  currentIndex == 1 ? IconlyBold.bag : IconlyLight.bag,
-                  color: currentIndex == 1 ? Color(0xff2F2F2F) : Colors.grey,
-                  size: currentIndex == 1 ? 30 : 28,
-                ),
-              ),
-              GestureDetector(
-                onTap: () {
-                  setState(() {
-                    pageController.jumpToPage(2);
-                    currentIndex = 2;
-                  });
-                },
-                child: Icon(
-                  currentIndex == 2
-                      ? IconlyBold.bookmark
-                      : IconlyLight.bookmark,
-                  color: currentIndex == 2 ? Color(0xff2F2F2F) : Colors.grey,
-                  size: currentIndex == 2 ? 30 : 28,
-                ),
-              ),
-              GestureDetector(
-                onTap: () {
-                  setState(() {
-                    pageController.jumpToPage(3);
-                    currentIndex = 3;
-                  });
-                },
-                child: Icon(
-                  currentIndex == 3 ? IconlyBold.profile : IconlyLight.profile,
-                  color: currentIndex == 3 ? Color(0xff2F2F2F) : Colors.grey,
-                  size: currentIndex == 3 ? 30 : 28,
-                ),
-              ),
+              ///1
+              TextButton(onPressed: (){
+                setState(() {
+                  pageController.jumpToPage(0);
+                  currentIndex = 0;
+                });
+              }, child: Icon(
+                currentIndex == 0 ? IconlyBold.home : IconlyLight.home,
+                color: currentIndex == 0 ? Color(0xff2F2F2F) : Colors.grey,
+                size: currentIndex == 0 ? 30 : 28,
+              )),
+              ///2
+              TextButton(onPressed: (){
+                setState(() {
+                  pageController.jumpToPage(1);
+                  currentIndex = 1;
+                });
+              }, child: Icon(
+                currentIndex == 1 ? IconlyBold.category : IconlyLight.category,
+                color: currentIndex == 1 ? Color(0xff2F2F2F) : Colors.grey,
+                size: currentIndex == 1 ? 30 : 28,
+              )),
+              ///3
+              TextButton(onPressed: (){
+                setState(() {
+                  pageController.jumpToPage(2);
+                  currentIndex = 2;
+                });
+              }, child: Icon(
+                currentIndex == 2
+                    ? IconlyBold.bookmark
+                    : IconlyLight.bookmark,
+                color: currentIndex == 2 ? Color(0xff2F2F2F) : Colors.grey,
+                size: currentIndex == 2 ? 30 : 28,
+              )),
+              ///4
+              TextButton(onPressed: (){
+                setState(() {
+                  pageController.jumpToPage(3);
+                  currentIndex = 3;
+                });
+              }, child: Icon(
+                currentIndex == 3 ? IconlyBold.profile : IconlyLight.profile,
+                color: currentIndex == 3 ? Color(0xff2F2F2F) : Colors.grey,
+                size: currentIndex == 3 ? 30 : 28,
+              )),
+              // GestureDetector(
+              //   onTap: () {
+              //     setState(() {
+              //       pageController.jumpToPage(0);
+              //       currentIndex = 0;
+              //     });
+              //   },
+              //   child: Icon(
+              //     currentIndex == 0 ? IconlyBold.home : IconlyLight.home,
+              //     color: currentIndex == 0 ? Color(0xff2F2F2F) : Colors.grey,
+              //     size: currentIndex == 0 ? 30 : 28,
+              //   ),
+              // ),
+              // GestureDetector(
+              //   onTap: () {
+              //     setState(() {
+              //       pageController.jumpToPage(1);
+              //       currentIndex = 1;
+              //     });
+              //   },
+              //   child: Icon(
+              //     currentIndex == 1 ? IconlyBold.category : IconlyLight.category,
+              //     color: currentIndex == 1 ? Color(0xff2F2F2F) : Colors.grey,
+              //     size: currentIndex == 1 ? 30 : 28,
+              //   ),
+              // ),
+              // GestureDetector(
+              //   onTap: () {
+              //     setState(() {
+              //       pageController.jumpToPage(2);
+              //       currentIndex = 2;
+              //     });
+              //   },
+              //   child: Icon(
+              //     currentIndex == 2
+              //         ? IconlyBold.bookmark
+              //         : IconlyLight.bookmark,
+              //     color: currentIndex == 2 ? Color(0xff2F2F2F) : Colors.grey,
+              //     size: currentIndex == 2 ? 30 : 28,
+              //   ),
+              // ),
+              // GestureDetector(
+              //   onTap: () {
+              //     setState(() {
+              //       pageController.jumpToPage(3);
+              //       currentIndex = 3;
+              //     });
+              //   },
+              //   child: Icon(
+              //     currentIndex == 3 ? IconlyBold.profile : IconlyLight.profile,
+              //     color: currentIndex == 3 ? Color(0xff2F2F2F) : Colors.grey,
+              //     size: currentIndex == 3 ? 30 : 28,
+              //   ),
+              // ),
             ],
           ),
         ),
